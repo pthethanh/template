@@ -9,84 +9,112 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
-	"github.com/pthethanh/micro/log"
 )
 
 // GeneralFuncMap return general func map.
 func GeneralFuncMap() template.FuncMap {
 	return template.FuncMap{
-		"is_true":   IsTrue,
-		"is_empty":  IsEmpty,
-		"default":   Default,
-		"yesno":     YesNo,
-		"coalesce":  Coalesce,
-		"env":       os.Getenv,
-		"contains":  Contains,
-		"file_size": FileSizeFormat,
-		"uuid":      UUID,
+		"is_true":      IsTrue,
+		"is_empty":     IsEmpty,
+		"default":      Default,
+		"yesno":        YesNo,
+		"coalesce":     Coalesce,
+		"env":          os.Getenv,
+		"contains":     Contains,
+		"contains_any": ContainsAny,
+		"file_size":    FileSizeFormat,
+		"uuid":         UUID,
+		"repeat":       Repeat,
+		"join":         Join,
 	}
+}
+
+// Repeat repeats the string representation of value n times.
+func Repeat(n int, v interface{}) string {
+	rs := &strings.Builder{}
+	for i := 0; i < n; i++ {
+		rs.WriteString(fmt.Sprintf("%v", v))
+	}
+	return rs.String()
+}
+
+// Join join the string representation of the values together.
+func Join(sep string, values ...interface{}) string {
+	rs := &strings.Builder{}
+	for _, v := range values {
+		rs.WriteString(fmt.Sprintf("%v%s", v, sep))
+	}
+	return rs.String()
 }
 
 // Contains check whether all the values exist in the collection.
 // The collection must be a slice, array, string or a map.
 func Contains(collection reflect.Value, values ...reflect.Value) bool {
-	contains := func(val reflect.Value) (bool, error) {
-		v := indirectInterface(collection)
-		if !v.IsValid() {
-			return false, errors.New("invalid value")
-		}
-		rVal := indirectInterface(val)
-		if !rVal.IsValid() {
-			return false, errors.New("invalid value")
-		}
-		switch v.Kind() {
-		case reflect.String:
-			// accept all kinds of val.
-			return strings.Contains(v.String(), fmt.Sprintf("%v", rVal)), nil
-		case reflect.Array, reflect.Slice:
-			for i := 0; i < v.Len(); i++ {
-				ok, err := eq(rVal, indirectInterface(v.Index(i)))
-				if err != nil {
-					return false, err
-				}
-				if ok {
-					return true, nil
-				}
-			}
-		case reflect.Map:
-			r := v.MapRange()
-			for r.Next() {
-				ok, err := eq(r.Value(), val)
-				if err != nil {
-					return false, err
-				}
-				if ok {
-					return true, nil
-				}
-			}
-		default:
-			return false, nil
-		}
-		return false, nil
-	}
 	for _, val := range values {
-		if ok, err := contains(val); !ok || err != nil {
-			if err != nil {
-				log.Errorf("contains: %v", err)
-			}
+		if ok, err := contains(collection, val); !ok || err != nil {
 			return false
 		}
 	}
 	return true
 }
 
-// YesNo returns the first value if the last value has meaningful value/IsTrue, otherwise returns the second value.
-func YesNo(v interface{}, vt interface{}, vf interface{}) interface{} {
-	if IsTrue(v) {
-		return vt
+// ContainsAny check whether one of the value exist in the collection.
+// The collection must be a slice, array, string or a map.
+func ContainsAny(collection reflect.Value, values ...reflect.Value) bool {
+	for _, val := range values {
+		if ok, err := contains(collection, val); ok && err == nil {
+			return true
+		}
 	}
+	return false
+}
 
-	return vf
+func contains(collection reflect.Value, val reflect.Value) (bool, error) {
+	v := indirectInterface(collection)
+	if !v.IsValid() {
+		return false, errors.New("invalid value")
+	}
+	rVal := indirectInterface(val)
+	if !rVal.IsValid() {
+		return false, errors.New("invalid value")
+	}
+	switch v.Kind() {
+	case reflect.String:
+		// accept all kinds of val.
+		return strings.Contains(v.String(), fmt.Sprintf("%v", rVal)), nil
+	case reflect.Array, reflect.Slice:
+		for i := 0; i < v.Len(); i++ {
+			ok, err := eq(rVal, indirectInterface(v.Index(i)))
+			if err != nil {
+				return false, err
+			}
+			if ok {
+				return true, nil
+			}
+		}
+	case reflect.Map:
+		r := v.MapRange()
+		for r.Next() {
+			ok, err := eq(r.Value(), val)
+			if err != nil {
+				return false, err
+			}
+			if ok {
+				return true, nil
+			}
+		}
+	default:
+		return false, nil
+	}
+	return false, nil
+}
+
+// YesNo returns the first value if the last value has meaningful value/IsTrue, otherwise returns the second value.
+func YesNo(y interface{}, n interface{}, v interface{}) interface{} {
+	if IsTrue(v) {
+		return y
+	}
+	return n
 }
 
 // Coalesce return first meaningful value (IsTrue).

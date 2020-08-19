@@ -17,14 +17,14 @@ var (
 // FuncMap return all func map.
 func FuncMap() template.FuncMap {
 	m := make(map[string]interface{})
-	addFuncs(m, GeneralFuncMap())
-	addFuncs(m, StringFuncMap())
+	AddFuncs(m, GeneralFuncMap())
+	AddFuncs(m, StringFuncMap())
 	return m
 }
 
-// addFuncs adds to values the functions in funcs.
-// it will panic if the func is not a good func or name is not a good name.
-func addFuncs(out, in template.FuncMap) {
+// AddFuncs adds to values the functions in funcs.
+// It will panic if the func is not a good func or name is not a good name.
+func AddFuncs(out, in template.FuncMap) {
 	for name, fn := range in {
 		if !goodName(name) {
 			panic(fmt.Sprintf("%s is not a good name", name))

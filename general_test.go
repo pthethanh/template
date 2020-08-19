@@ -138,37 +138,37 @@ func TestYesNo(t *testing.T) {
 	testIt(t, []testCase{
 		{
 			name:     "yesno: string ok",
-			template: `{{yesno . "OK" "NOK"}}`,
+			template: `{{.|yesno "OK" "NOK"}}`,
 			data:     "ok",
 			output:   "OK",
 		},
 		{
 			name:     "yesno: string nok",
-			template: `{{yesno . "OK" "NOK"}}`,
+			template: `{{.|yesno "OK" "NOK"}}`,
 			data:     "",
 			output:   "NOK",
 		},
 		{
 			name:     "yesno: number ok",
-			template: `{{yesno . "OK" "NOK"}}`,
+			template: `{{.|yesno "OK" "NOK"}}`,
 			data:     1,
 			output:   "OK",
 		},
 		{
 			name:     "yesno: number nok",
-			template: `{{yesno . "OK" "NOK"}}`,
+			template: `{{.|yesno "OK" "NOK"}}`,
 			data:     0,
 			output:   "NOK",
 		},
 		{
 			name:     "yesno: bool ok",
-			template: `{{yesno . "OK" "NOK"}}`,
+			template: `{{.|yesno "OK" "NOK"}}`,
 			data:     true,
 			output:   "OK",
 		},
 		{
 			name:     "yesno: bool nok",
-			template: `{{yesno . "OK" "NOK"}}`,
+			template: `{{.|yesno "OK" "NOK"}}`,
 			data:     false,
 			output:   "NOK",
 		},
@@ -297,6 +297,24 @@ func TestContains(t *testing.T) {
 			data:     &arr,
 			output:   "false",
 		},
+		{
+			name:     "contains any: map multiple all exists in map",
+			template: `{{contains_any . 5 6 2}}`,
+			data:     map[int]int{0: 0, 1: 1, 2: 2},
+			output:   "true",
+		},
+		{
+			name:     "contains any - string",
+			template: `{{contains_any . "x" "y"}}`,
+			data:     "my name is jack",
+			output:   "true",
+		},
+		{
+			name:     "contains any - false",
+			template: `{{contains_any . "x" "y"}}`,
+			data:     "mi name is jack",
+			output:   "false",
+		},
 	})
 }
 
@@ -311,6 +329,35 @@ func TestUUID(t *testing.T) {
 				}
 				return nil
 			},
+		},
+	})
+}
+
+func TestRepeat(t *testing.T) {
+	testIt(t, []testCase{
+		{
+			name:     "repeat string",
+			template: `{{.|repeat 3}}`,
+			data:     "x",
+			output:   "xxx",
+		},
+		{
+			name:     "repeat int",
+			template: `{{.|repeat 3}}`,
+			data:     3,
+			output:   "333",
+		},
+		{
+			name:     "repeat bool",
+			template: `{{.|repeat 3}}`,
+			data:     true,
+			output:   "truetruetrue",
+		},
+		{
+			name:     "repeat make sure result is string",
+			template: `{{eq (.|repeat 3) "111"}}`,
+			data:     1,
+			output:   "true",
 		},
 	})
 }
