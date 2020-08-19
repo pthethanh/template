@@ -134,7 +134,7 @@ func TestDefault(t *testing.T) {
 	})
 }
 
-func Testyesno(t *testing.T) {
+func TestYesNo(t *testing.T) {
 	testIt(t, []testCase{
 		{
 			name:     "yesno: string ok",
@@ -235,6 +235,7 @@ func TestEnv(t *testing.T) {
 }
 
 func TestContains(t *testing.T) {
+	arr := []int{1, 2}
 	testIt(t, []testCase{
 		{
 			name:     "string true",
@@ -288,6 +289,12 @@ func TestContains(t *testing.T) {
 			name:     "invalid type - false",
 			template: `{{contains . 1}}`,
 			data:     1,
+			output:   "false",
+		},
+		{
+			name:     "pointer array",
+			template: `{{contains . 1}}`,
+			data:     &arr,
 			output:   "false",
 		},
 	})
