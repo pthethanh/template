@@ -22,10 +22,16 @@ func FuncMap() template.FuncMap {
 	return m
 }
 
-// addFuncs adds to values the functions in funcs. It does no checking of the input -
-// call addValueFuncs first.
+// addFuncs adds to values the functions in funcs.
+// it will panic if the func is not a good func or name is not a good name.
 func addFuncs(out, in template.FuncMap) {
 	for name, fn := range in {
+		if !goodName(name) {
+			panic(fmt.Sprintf("%s is not a good name", name))
+		}
+		if !goodFunc(reflect.TypeOf(fn)) {
+			panic(fmt.Sprintf("%s is not a good func", fn))
+		}
 		out[name] = fn
 	}
 }
@@ -147,8 +153,6 @@ func index(item reflect.Value, indexes ...reflect.Value) (reflect.Value, error) 
 	}
 	return v, nil
 }
-
-// Slicing.
 
 // slice returns the result of slicing its first argument by the remaining
 // arguments. Thus "slice x 1 2" is, in Go syntax, x[1:2], while "slice x"
