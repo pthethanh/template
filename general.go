@@ -12,8 +12,8 @@ import (
 )
 
 // GeneralFuncMap return general func map.
-func GeneralFuncMap() template.FuncMap {
-	return template.FuncMap{
+func GeneralFuncMap() map[string]interface{} {
+	return map[string]interface{}{
 		"is_true":      IsTrue,
 		"is_empty":     IsEmpty,
 		"default":      Default,

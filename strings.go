@@ -2,13 +2,12 @@ package template
 
 import (
 	"fmt"
-	"html/template"
 	"strings"
 )
 
 // StringFuncMap return string func map.
-func StringFuncMap() template.FuncMap {
-	return template.FuncMap{
+func StringFuncMap() map[string]interface{} {
+	return map[string]interface{}{
 		"upper":       strings.ToUpper,
 		"lower":       strings.ToLower,
 		"string":      func(v interface{}) string { return fmt.Sprintf("%v", v) },

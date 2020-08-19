@@ -3,7 +3,6 @@ package template
 import (
 	"errors"
 	"fmt"
-	"html/template"
 	"reflect"
 	"unicode"
 )
@@ -15,7 +14,7 @@ var (
 )
 
 // FuncMap return all func map.
-func FuncMap() template.FuncMap {
+func FuncMap() map[string]interface{} {
 	m := make(map[string]interface{})
 	AddFuncs(m, GeneralFuncMap())
 	AddFuncs(m, StringFuncMap())
@@ -24,7 +23,7 @@ func FuncMap() template.FuncMap {
 
 // AddFuncs adds to values the functions in funcs.
 // It will panic if the func is not a good func or name is not a good name.
-func AddFuncs(out, in template.FuncMap) {
+func AddFuncs(out, in map[string]interface{}) {
 	for name, fn := range in {
 		if !goodName(name) {
 			panic(fmt.Sprintf("%s is not a good name", name))
