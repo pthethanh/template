@@ -1,7 +1,6 @@
 package template
 
 import (
-	"errors"
 	"fmt"
 	"html/template"
 	"os"
@@ -33,25 +32,45 @@ func GeneralFuncMap() map[string]interface{} {
 func Repeat(n int, v interface{}) string {
 	rs := &strings.Builder{}
 	for i := 0; i < n; i++ {
-		rs.WriteString(fmt.Sprintf("%v", v))
+		rs.WriteString(fmt.Sprintf("%v", printableValue(reflect.ValueOf(v))))
 	}
 	return rs.String()
 }
 
 // Join join the string representation of the values together.
+// String will be joined as whole.
+// Map, slice, array will be joined using its value, one by one.
 func Join(sep string, values ...interface{}) string {
-	rs := &strings.Builder{}
-	for _, v := range values {
-		rs.WriteString(fmt.Sprintf("%v%s", v, sep))
+	rs := make([]string, 0)
+	for _, val := range values {
+		v, isNil := indirect(reflect.ValueOf(val))
+		if isNil {
+			return ""
+		}
+		switch v.Kind() {
+		case reflect.String:
+			rs = append(rs, v.String())
+		case reflect.Array, reflect.Slice:
+			for i := 0; i < v.Len(); i++ {
+				rs = append(rs, fmt.Sprintf("%v", printableValue(v.Index(i))))
+			}
+		case reflect.Map:
+			r := v.MapRange()
+			for r.Next() {
+				rs = append(rs, fmt.Sprintf("%v", printableValue(r.Value())))
+			}
+		default:
+			rs = append(rs, fmt.Sprintf("%v", printableValue(v)))
+		}
 	}
-	return rs.String()
+	return strings.Join(rs, sep)
 }
 
 // Contains check whether all the values exist in the collection.
 // The collection must be a slice, array, string or a map.
 func Contains(collection reflect.Value, values ...reflect.Value) bool {
 	for _, val := range values {
-		if ok, err := contains(collection, val); !ok || err != nil {
+		if ok := contains(collection, val); !ok {
 			return false
 		}
 	}
@@ -62,51 +81,50 @@ func Contains(collection reflect.Value, values ...reflect.Value) bool {
 // The collection must be a slice, array, string or a map.
 func ContainsAny(collection reflect.Value, values ...reflect.Value) bool {
 	for _, val := range values {
-		if ok, err := contains(collection, val); ok && err == nil {
+		if ok := contains(collection, val); ok {
 			return true
 		}
 	}
 	return false
 }
 
-func contains(collection reflect.Value, val reflect.Value) (bool, error) {
-	v := indirectInterface(collection)
-	if !v.IsValid() {
-		return false, errors.New("invalid value")
+func contains(collection reflect.Value, val reflect.Value) bool {
+	v, isNil := indirect(collection)
+	if isNil {
+		return false
 	}
-	rVal := indirectInterface(val)
-	if !rVal.IsValid() {
-		return false, errors.New("invalid value")
-	}
+	val, isNil = indirect(val)
 	switch v.Kind() {
 	case reflect.String:
 		// accept all kinds of val.
-		return strings.Contains(v.String(), fmt.Sprintf("%v", rVal)), nil
+		return strings.Contains(v.String(), fmt.Sprintf("%v", val))
 	case reflect.Array, reflect.Slice:
 		for i := 0; i < v.Len(); i++ {
-			ok, err := eq(rVal, indirectInterface(v.Index(i)))
-			if err != nil {
-				return false, err
+			iv, vIsNil := indirect(v.Index(i))
+			// accept compare nil, nil
+			if isNil && vIsNil || (!val.IsValid() && !iv.IsValid()) {
+				return true
 			}
-			if ok {
-				return true, nil
+			if ok, _ := eq(val, iv); ok {
+				return true
 			}
 		}
 	case reflect.Map:
 		r := v.MapRange()
 		for r.Next() {
-			ok, err := eq(r.Value(), val)
-			if err != nil {
-				return false, err
+			iv, vIsNil := indirect(r.Value())
+			// accept compare nil, nil
+			if isNil && vIsNil || (!val.IsValid() && !iv.IsValid()) {
+				return true
 			}
-			if ok {
-				return true, nil
+			if ok, _ := eq(iv, val); ok {
+				return true
 			}
 		}
 	default:
-		return false, nil
+		return false
 	}
-	return false, nil
+	return false
 }
 
 // YesNo returns the first value if the last value has meaningful value/IsTrue, otherwise returns the second value.

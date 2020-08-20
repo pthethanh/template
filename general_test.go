@@ -236,6 +236,7 @@ func TestEnv(t *testing.T) {
 
 func TestContains(t *testing.T) {
 	arr := []int{1, 2}
+	x := 5
 	testIt(t, []testCase{
 		{
 			name:     "string true",
@@ -295,7 +296,7 @@ func TestContains(t *testing.T) {
 			name:     "pointer array",
 			template: `{{contains . 1}}`,
 			data:     &arr,
-			output:   "false",
+			output:   "true",
 		},
 		{
 			name:     "contains any: map multiple all exists in map",
@@ -304,16 +305,67 @@ func TestContains(t *testing.T) {
 			output:   "true",
 		},
 		{
-			name:     "contains any - string",
+			name:     "contains any string",
 			template: `{{contains_any . "x" "y"}}`,
 			data:     "my name is jack",
 			output:   "true",
 		},
 		{
-			name:     "contains any - false",
+			name:     "contains any false",
 			template: `{{contains_any . "x" "y"}}`,
 			data:     "mi name is jack",
 			output:   "false",
+		},
+		{
+			name:     "contains any slice of pointer, pointer val",
+			template: `{{contains_any (index . "list") (index . "val")}}`,
+			data: map[string]interface{}{
+				"list": []*int{&x},
+				"val":  &x,
+			},
+			output: "true",
+		},
+		{
+			name:     "contains any pointer slice, pointer val",
+			template: `{{contains_any (index . "list") (index . "val")}}`,
+			data: map[string]interface{}{
+				"list": &arr,
+				"val":  &x,
+			},
+			output: "false",
+		},
+		{
+			name:     "contains any pointer slice, normal inline val",
+			template: `{{contains_any . 5}}`,
+			data:     []*int{&x},
+			output:   "true",
+		},
+		{
+			name:     "contains any normal slice, pointer val",
+			template: `{{contains_any (index . "list") (index . "val")}}`,
+			data: map[string]interface{}{
+				"list": []int{1, 2, 3, 4, 5},
+				"val":  &x,
+			},
+			output: "true",
+		},
+		{
+			name:     "contains nil nil",
+			template: `{{contains (index . "list") (index . "val")}}`,
+			data: map[string]interface{}{
+				"list": nil,
+				"val":  nil,
+			},
+			output: "false",
+		},
+		{
+			name:     "contains val nil",
+			template: `{{contains (index . "list") (index . "val")}}`,
+			data: map[string]interface{}{
+				"list": []interface{}{1, nil},
+				"val":  nil,
+			},
+			output: "true",
 		},
 	})
 }
@@ -334,6 +386,7 @@ func TestUUID(t *testing.T) {
 }
 
 func TestRepeat(t *testing.T) {
+	x := 5
 	testIt(t, []testCase{
 		{
 			name:     "repeat string",
@@ -358,6 +411,51 @@ func TestRepeat(t *testing.T) {
 			template: `{{eq (.|repeat 3) "111"}}`,
 			data:     1,
 			output:   "true",
+		},
+		{
+			name:     "repeat pointer",
+			template: `{{.|repeat 3}}`,
+			data:     &x,
+			output:   "555",
+		},
+	})
+}
+
+func TestJoin(t *testing.T) {
+	x := 5
+	s := []interface{}{"1", 2, 3.0, 4.1, &x, true}
+	testIt(t, []testCase{
+		{
+			name:     "join multiple types - map",
+			template: `{{join "," 1 "2" 3 .}}`,
+			data: map[string]int{
+				"x": 1,
+				"y": 2,
+			},
+			verifyFunc: func(s string) error {
+				if !strings.HasPrefix(s, "1,2,3,") || len(s) != 9 {
+					return fmt.Errorf("got result=%v, want result=%v or result=%v", s, "1,2,3,1,2", "1,2,3,2,1")
+				}
+				return nil
+			},
+		},
+		{
+			name:     "join multiple types - slice",
+			template: `{{join "," 1 "2" 3 .}}`,
+			data:     []int{1, 2},
+			output:   "1,2,3,1,2",
+		},
+		{
+			name:     "join multiple types - slice interface pointer",
+			template: `{{.|join ","}}`,
+			data:     &s,
+			output:   "1,2,3,4.1,5,true",
+		},
+		{
+			name:     "join multiple types - pointer",
+			template: `{{join "," 1 2 3 4 .}}`,
+			data:     &x,
+			output:   "1,2,3,4,5",
 		},
 	})
 }
