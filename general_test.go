@@ -460,6 +460,47 @@ func TestJoin(t *testing.T) {
 	})
 }
 
+func TestFileFormatSize(t *testing.T) {
+	testIt(t, []testCase{
+		{
+			name:     "byte",
+			template: `{{.|file_size}}`,
+			data:     10,
+			output:   "10 bytes",
+		},
+		{
+			name:     "kb",
+			template: `{{.|file_size}}`,
+			data:     1024 * 2,
+			output:   "2 KB",
+		},
+		{
+			name:     "mb",
+			template: `{{.|file_size}}`,
+			data:     2 * 1024 * 1024,
+			output:   "2 MB",
+		},
+		{
+			name:     "gb",
+			template: `{{.|file_size}}`,
+			data:     2 * 1024 * 1024 * 1024,
+			output:   "2 GB",
+		},
+		{
+			name:     "tb",
+			template: `{{.|file_size}}`,
+			data:     2 * 1024 * 1024 * 1024 * 1024,
+			output:   "2 TB",
+		},
+		{
+			name:     "pb",
+			template: `{{.|file_size}}`,
+			data:     2.5 * 1024 * 1024 * 1024 * 1024 * 1024,
+			output:   "2.5 PB",
+		},
+	})
+}
+
 func testIt(t *testing.T, cases []testCase) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {

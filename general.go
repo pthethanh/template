@@ -26,7 +26,18 @@ func GeneralFuncMap() map[string]interface{} {
 		"uuid":         UUID,
 		"repeat":       Repeat,
 		"join":         Join,
+		"eq_any":       EqualAny,
 	}
+}
+
+// EqualAny return true if v equal to one of the values.
+func EqualAny(v interface{}, values ...interface{}) bool {
+	for _, val := range values {
+		if ok, err := eq(reflect.ValueOf(v), reflect.ValueOf(val)); ok && err == nil {
+			return true
+		}
+	}
+	return false
 }
 
 // Repeat repeats the string representation of value n times.
