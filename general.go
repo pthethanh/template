@@ -17,6 +17,7 @@ func GeneralFuncMap() map[string]interface{} {
 		"is_empty":     IsEmpty,
 		"default":      Default,
 		"yesno":        YesNo,
+		"ternary":      YesNo,
 		"coalesce":     Coalesce,
 		"env":          os.Getenv,
 		"contains":     Contains,
@@ -128,7 +129,7 @@ func contains(collection reflect.Value, val reflect.Value) bool {
 }
 
 // YesNo returns the first value if the last value has meaningful value/IsTrue, otherwise returns the second value.
-func YesNo(y interface{}, n interface{}, v interface{}) interface{} {
+func YesNo(v interface{}, y interface{}, n interface{}) interface{} {
 	if IsTrue(v) {
 		return y
 	}

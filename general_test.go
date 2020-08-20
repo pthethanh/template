@@ -138,37 +138,37 @@ func TestYesNo(t *testing.T) {
 	testIt(t, []testCase{
 		{
 			name:     "yesno: string ok",
-			template: `{{.|yesno "OK" "NOK"}}`,
+			template: `{{yesno . "OK" "NOK"}}`,
 			data:     "ok",
 			output:   "OK",
 		},
 		{
 			name:     "yesno: string nok",
-			template: `{{.|yesno "OK" "NOK"}}`,
+			template: `{{yesno . "OK" "NOK"}}`,
 			data:     "",
 			output:   "NOK",
 		},
 		{
 			name:     "yesno: number ok",
-			template: `{{.|yesno "OK" "NOK"}}`,
+			template: `{{yesno . "OK" "NOK"}}`,
 			data:     1,
 			output:   "OK",
 		},
 		{
 			name:     "yesno: number nok",
-			template: `{{.|yesno "OK" "NOK"}}`,
+			template: `{{yesno . "OK" "NOK"}}`,
 			data:     0,
 			output:   "NOK",
 		},
 		{
 			name:     "yesno: bool ok",
-			template: `{{.|yesno "OK" "NOK"}}`,
+			template: `{{yesno . "OK" "NOK"}}`,
 			data:     true,
 			output:   "OK",
 		},
 		{
 			name:     "yesno: bool nok",
-			template: `{{.|yesno "OK" "NOK"}}`,
+			template: `{{yesno . "OK" "NOK"}}`,
 			data:     false,
 			output:   "NOK",
 		},
