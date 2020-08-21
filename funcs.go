@@ -42,6 +42,7 @@ func FuncMap() map[string]interface{} {
 	m := make(map[string]interface{})
 	AddFuncs(m, GeneralFuncMap())
 	AddFuncs(m, StringFuncMap())
+	AddFuncs(m, NumberFuncMap())
 	return m
 }
 

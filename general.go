@@ -13,20 +13,21 @@ import (
 // GeneralFuncMap return general func map.
 func GeneralFuncMap() map[string]interface{} {
 	return map[string]interface{}{
-		"is_true":      IsTrue,
-		"is_empty":     IsEmpty,
-		"default":      Default,
-		"yesno":        YesNo,
-		"ternary":      YesNo,
-		"coalesce":     Coalesce,
-		"env":          os.Getenv,
-		"contains":     Contains,
-		"contains_any": ContainsAny,
-		"file_size":    FileSizeFormat,
-		"uuid":         UUID,
-		"repeat":       Repeat,
-		"join":         Join,
-		"eq_any":       EqualAny,
+		"is_true":   IsTrue,
+		"is_empty":  IsEmpty,
+		"default":   Default,
+		"yesno":     YesNo,
+		"ternary":   YesNo,
+		"coalesce":  Coalesce,
+		"env":       os.Getenv,
+		"has":       Has,
+		"has_any":   HasAny,
+		"file_size": FileSizeFormat,
+		"uuid":      UUID,
+		"repeat":    Repeat,
+		"join":      Join,
+		"eq_any":    EqualAny,
+		"deep_eq":   reflect.DeepEqual,
 	}
 }
 
@@ -78,29 +79,29 @@ func Join(sep string, values ...interface{}) string {
 	return strings.Join(rs, sep)
 }
 
-// Contains check whether all the values exist in the collection.
+// Has check whether all the values exist in the collection.
 // The collection must be a slice, array, string or a map.
-func Contains(collection reflect.Value, values ...reflect.Value) bool {
+func Has(collection reflect.Value, values ...reflect.Value) bool {
 	for _, val := range values {
-		if ok := contains(collection, val); !ok {
+		if ok := has(collection, val); !ok {
 			return false
 		}
 	}
 	return true
 }
 
-// ContainsAny check whether one of the value exist in the collection.
+// HasAny check whether one of the value exist in the collection.
 // The collection must be a slice, array, string or a map.
-func ContainsAny(collection reflect.Value, values ...reflect.Value) bool {
+func HasAny(collection reflect.Value, values ...reflect.Value) bool {
 	for _, val := range values {
-		if ok := contains(collection, val); ok {
+		if ok := has(collection, val); ok {
 			return true
 		}
 	}
 	return false
 }
 
-func contains(collection reflect.Value, val reflect.Value) bool {
+func has(collection reflect.Value, val reflect.Value) bool {
 	v, isNil := indirect(collection)
 	if isNil {
 		return false

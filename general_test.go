@@ -234,91 +234,91 @@ func TestEnv(t *testing.T) {
 	}
 }
 
-func TestContains(t *testing.T) {
+func TestHas(t *testing.T) {
 	arr := []int{1, 2}
 	x := 5
 	testIt(t, []testCase{
 		{
 			name:     "string true",
-			template: `{{contains . "x"}}`,
+			template: `{{has . "x"}}`,
 			data:     "hellox",
 			output:   "true",
 		},
 		{
 			name:     "string false",
-			template: `{{contains . "x"}}`,
+			template: `{{has . "x"}}`,
 			data:     "hello",
 			output:   "false",
 		},
 		{
 			name:     "slice true",
-			template: `{{contains . "x"}}`,
+			template: `{{has . "x"}}`,
 			data:     []string{"y", "x"},
 			output:   "true",
 		},
 		{
 			name:     "slice false",
-			template: `{{contains . "z"}}`,
+			template: `{{has . "z"}}`,
 			data:     []string{"y", "x"},
 			output:   "false",
 		},
 		{
 			name:     "map true",
-			template: `{{contains . 1}}`,
+			template: `{{has . 1}}`,
 			data:     map[int]int{0: 0, 1: 1},
 			output:   "true",
 		},
 		{
 			name:     "map false",
-			template: `{{contains . 2}}`,
+			template: `{{has . 2}}`,
 			data:     map[int]int{0: 0, 1: 1},
 			output:   "false",
 		},
 		{
 			name:     "map multiple one not in map",
-			template: `{{contains . 0 1 2}}`,
+			template: `{{has . 0 1 2}}`,
 			data:     map[int]int{0: 0, 1: 1},
 			output:   "false",
 		},
 		{
 			name:     "map multiple all exists in map",
-			template: `{{contains . 0 1 2}}`,
+			template: `{{has . 0 1 2}}`,
 			data:     map[int]int{0: 0, 1: 1, 2: 2},
 			output:   "true",
 		},
 		{
 			name:     "invalid type - false",
-			template: `{{contains . 1}}`,
+			template: `{{has . 1}}`,
 			data:     1,
 			output:   "false",
 		},
 		{
 			name:     "pointer array",
-			template: `{{contains . 1}}`,
+			template: `{{has . 1}}`,
 			data:     &arr,
 			output:   "true",
 		},
 		{
-			name:     "contains any: map multiple all exists in map",
-			template: `{{contains_any . 5 6 2}}`,
+			name:     "has any: map multiple all exists in map",
+			template: `{{has_any . 5 6 2}}`,
 			data:     map[int]int{0: 0, 1: 1, 2: 2},
 			output:   "true",
 		},
 		{
-			name:     "contains any string",
-			template: `{{contains_any . "x" "y"}}`,
+			name:     "has any string",
+			template: `{{has_any . "x" "y"}}`,
 			data:     "my name is jack",
 			output:   "true",
 		},
 		{
-			name:     "contains any false",
-			template: `{{contains_any . "x" "y"}}`,
+			name:     "has any false",
+			template: `{{has_any . "x" "y"}}`,
 			data:     "mi name is jack",
 			output:   "false",
 		},
 		{
-			name:     "contains any slice of pointer, pointer val",
-			template: `{{contains_any (index . "list") (index . "val")}}`,
+			name:     "has any slice of pointer, pointer val",
+			template: `{{has_any (index . "list") (index . "val")}}`,
 			data: map[string]interface{}{
 				"list": []*int{&x},
 				"val":  &x,
@@ -326,8 +326,8 @@ func TestContains(t *testing.T) {
 			output: "true",
 		},
 		{
-			name:     "contains any pointer slice, pointer val",
-			template: `{{contains_any (index . "list") (index . "val")}}`,
+			name:     "has any pointer slice, pointer val",
+			template: `{{has_any (index . "list") (index . "val")}}`,
 			data: map[string]interface{}{
 				"list": &arr,
 				"val":  &x,
@@ -335,14 +335,14 @@ func TestContains(t *testing.T) {
 			output: "false",
 		},
 		{
-			name:     "contains any pointer slice, normal inline val",
-			template: `{{contains_any . 5}}`,
+			name:     "has any pointer slice, normal inline val",
+			template: `{{has_any . 5}}`,
 			data:     []*int{&x},
 			output:   "true",
 		},
 		{
-			name:     "contains any normal slice, pointer val",
-			template: `{{contains_any (index . "list") (index . "val")}}`,
+			name:     "has any normal slice, pointer val",
+			template: `{{has_any (index . "list") (index . "val")}}`,
 			data: map[string]interface{}{
 				"list": []int{1, 2, 3, 4, 5},
 				"val":  &x,
@@ -350,8 +350,8 @@ func TestContains(t *testing.T) {
 			output: "true",
 		},
 		{
-			name:     "contains nil nil",
-			template: `{{contains (index . "list") (index . "val")}}`,
+			name:     "has nil nil",
+			template: `{{has (index . "list") (index . "val")}}`,
 			data: map[string]interface{}{
 				"list": nil,
 				"val":  nil,
@@ -359,8 +359,8 @@ func TestContains(t *testing.T) {
 			output: "false",
 		},
 		{
-			name:     "contains val nil",
-			template: `{{contains (index . "list") (index . "val")}}`,
+			name:     "has val nil",
+			template: `{{has (index . "list") (index . "val")}}`,
 			data: map[string]interface{}{
 				"list": []interface{}{1, nil},
 				"val":  nil,
@@ -417,6 +417,24 @@ func TestRepeat(t *testing.T) {
 			template: `{{.|repeat 3}}`,
 			data:     &x,
 			output:   "555",
+		},
+		{
+			name:     "deep equal slice",
+			template: `{{deep_eq (index . "list") (index . "val")}}`,
+			data: map[string]interface{}{
+				"list": []int{1, 2, 3, 4, 5},
+				"val":  []int{1, 2, 3, 4, 5},
+			},
+			output: "true",
+		},
+		{
+			name:     "equal slice and  array work around",
+			template: `{{eq ((index . "list")|string) ((index . "val")|string)}}`,
+			data: map[string]interface{}{
+				"list": []int{1, 2, 3, 4, 5},
+				"val":  [5]int{1, 2, 3, 4, 5},
+			},
+			output: "true",
 		},
 	})
 }
