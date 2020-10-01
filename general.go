@@ -28,6 +28,7 @@ func GeneralFuncMap() map[string]interface{} {
 		"join":      Join,
 		"eq_any":    EqualAny,
 		"deep_eq":   reflect.DeepEqual,
+		"map":       Map,
 	}
 }
 
@@ -229,4 +230,19 @@ func FileSizeFormat(value interface{}) string {
 	}
 
 	return result
+}
+
+// Map return a map of string -> interface from provided key/value pairs.
+func Map(v ...interface{}) map[string]interface{} {
+	m := map[string]interface{}{}
+	lv := len(v)
+	for i := 0; i < lv; i += 2 {
+		key := fmt.Sprintf("%v", v[i])
+		if i+1 >= lv {
+			m[key] = ""
+			continue
+		}
+		m[key] = v[i+1]
+	}
+	return m
 }
