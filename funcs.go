@@ -43,6 +43,7 @@ func FuncMap() map[string]interface{} {
 	AddFuncs(m, GeneralFuncMap())
 	AddFuncs(m, StringFuncMap())
 	AddFuncs(m, NumberFuncMap())
+	AddFuncs(m, TimeFuncMap())
 	return m
 }
 
