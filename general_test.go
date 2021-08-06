@@ -22,65 +22,6 @@ type (
 	}
 )
 
-func TestIsTrue(t *testing.T) {
-	testIt(t, []testCase{
-		{
-			name:     "istrue: string true",
-			template: "{{is_true .}}",
-			data:     "ok",
-			output:   "true",
-		},
-		{
-			name:     "istrue: string false",
-			template: "{{is_true .}}",
-			data:     "",
-			output:   "false",
-		},
-		{
-			name:     "istrue: number false",
-			template: "{{is_true .}}",
-			data:     0,
-			output:   "false",
-		},
-		{
-			name:     "istrue: number true",
-			template: "{{is_true .}}",
-			data:     1,
-			output:   "true",
-		},
-		{
-			name:     "istrue: array false",
-			template: "{{is_true .}}",
-			data:     []byte{},
-			output:   "false",
-		},
-		{
-			name:     "istrue: array true",
-			template: "{{is_true .}}",
-			data:     []byte("x"),
-			output:   "true",
-		},
-		{
-			name:     "istrue: pipeline true",
-			template: "{{.|is_true}}",
-			data:     []byte("x"),
-			output:   "true",
-		},
-		{
-			name:     "istrue: pipeline false",
-			template: "{{.|is_true}}",
-			data:     []byte{},
-			output:   "false",
-		},
-		{
-			name:     "istrue: empty",
-			template: "{{.|is_true}}",
-			data:     "",
-			output:   "false",
-		},
-	})
-}
-
 func TestDefault(t *testing.T) {
 	testIt(t, []testCase{
 		{
@@ -130,47 +71,6 @@ func TestDefault(t *testing.T) {
 			template: `{{.|default "NOK"}}`,
 			data:     map[string]string{"x": "y"},
 			output:   `map[x:y]`,
-		},
-	})
-}
-
-func TestYesNo(t *testing.T) {
-	testIt(t, []testCase{
-		{
-			name:     "yesno: string ok",
-			template: `{{yesno . "OK" "NOK"}}`,
-			data:     "ok",
-			output:   "OK",
-		},
-		{
-			name:     "yesno: string nok",
-			template: `{{yesno . "OK" "NOK"}}`,
-			data:     "",
-			output:   "NOK",
-		},
-		{
-			name:     "yesno: number ok",
-			template: `{{yesno . "OK" "NOK"}}`,
-			data:     1,
-			output:   "OK",
-		},
-		{
-			name:     "yesno: number nok",
-			template: `{{yesno . "OK" "NOK"}}`,
-			data:     0,
-			output:   "NOK",
-		},
-		{
-			name:     "yesno: bool ok",
-			template: `{{yesno . "OK" "NOK"}}`,
-			data:     true,
-			output:   "OK",
-		},
-		{
-			name:     "yesno: bool nok",
-			template: `{{yesno . "OK" "NOK"}}`,
-			data:     false,
-			output:   "NOK",
 		},
 	})
 }

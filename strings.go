@@ -26,7 +26,5 @@ func StringFuncMap() map[string]interface{} {
 		"count":       func(sub, s string) int { return strings.Count(s, sub) },
 		"split":       func(sep, s string) []string { return strings.Split(s, sep) },
 		"split_n":     func(sep string, n int, s string) []string { return strings.SplitN(s, sep, n) },
-		"backtick":    func(s interface{}) string { return fmt.Sprintf("`%v`", s) },
-		"backticks":   func(lang string, s interface{}) string { return fmt.Sprintf("```%s\n%v\n```", lang, s) },
 	}
 }

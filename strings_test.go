@@ -1,7 +1,6 @@
 package template_test
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -137,24 +136,6 @@ func TestStringCommon(t *testing.T) {
 			template: `{{.|split_n "x" 2}}`,
 			data:     "hellxnoxo",
 			output:   "[hell noxo]",
-		},
-		{
-			name:     "backtick",
-			template: `{{.|backtick}}`,
-			data:     "golang",
-			output:   "`golang`",
-		},
-		{
-			name:     "backtick",
-			template: `{{.|backtick}}`,
-			data:     1,
-			output:   "`1`",
-		},
-		{
-			name:     "backticks",
-			template: `{{.|backticks "golang"}}`,
-			data:     "fmt.Println(...)",
-			output:   fmt.Sprintf("```golang\nfmt.Println(...)\n```"),
 		},
 	})
 }

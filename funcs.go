@@ -8,17 +8,14 @@ import (
 )
 
 var (
-	errorType        = reflect.TypeOf((*error)(nil)).Elem()
-	fmtStringerType  = reflect.TypeOf((*fmt.Stringer)(nil)).Elem()
-	reflectValueType = reflect.TypeOf((*reflect.Value)(nil)).Elem()
+	errorType       = reflect.TypeOf((*error)(nil)).Elem()
+	fmtStringerType = reflect.TypeOf((*fmt.Stringer)(nil)).Elem()
 
-	zero       reflect.Value
-	missingVal = reflect.ValueOf(missingValType{})
+	zero reflect.Value
 )
 
 type (
-	missingValType struct{}
-	kind           int
+	kind int
 )
 
 var (
